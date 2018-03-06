@@ -61,7 +61,7 @@ void processQueue() {
   }
 
   char data[NUM_STRIPS * 3];
-  if (dequeueWithSize(data, sizeof(data)) {
+  if (dequeueWithSize(data, sizeof(data))) {
     showLeds(data);
   }
 }
@@ -98,7 +98,7 @@ void enqueue(char value) {
   if (rear == maxQueueSize - 1) return;
   if (front == -1) front =0;
   rear++;
-  queue[rear] = char;
+  queue[rear] = value;
 }
 
 boolean dequeue(char *value) {
@@ -108,7 +108,7 @@ boolean dequeue(char *value) {
 
   *value = queue[front];
   front++;
-  if (front - 1 = rear) {
+  if (front - 1 == rear) {
     front = -1;
     rear = -1;
   }
@@ -117,7 +117,7 @@ boolean dequeue(char *value) {
 
 boolean dequeueWithSize(char *data, unsigned int size) {
   if (rear - front + 1 >= size) {
-    if (memcopy(data, &queue[front], size)) {
+    if (memcpy(data, &queue[front], size)) {
       front += size;
       if (front - 1 == rear) {
         front = -1;
