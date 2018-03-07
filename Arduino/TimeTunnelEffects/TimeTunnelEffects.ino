@@ -2,13 +2,13 @@
 
 #define COLOR_ORDER GRB
 
-#define NUM_STRIPS 17
-#define NUM_LEDS 620
+#define NUM_STRIPS 8
+#define NUM_LEDS 16
 
 CRGB leds[NUM_STRIPS][NUM_LEDS];
 
 int type = 0;
-char mode = '0';
+char mode = '3';
 
 void setup() {
 //  Serial.begin(115200);
@@ -21,15 +21,15 @@ void setup() {
   FastLED.addLeds<WS2812B, 7, COLOR_ORDER>(leds[5], NUM_LEDS);
   FastLED.addLeds<WS2812B, 8, COLOR_ORDER>(leds[6], NUM_LEDS);
   FastLED.addLeds<WS2812B, 9, COLOR_ORDER>(leds[7], NUM_LEDS);
-  FastLED.addLeds<WS2812B, 10, COLOR_ORDER>(leds[8], NUM_LEDS);
-  FastLED.addLeds<WS2812B, 11, COLOR_ORDER>(leds[9], NUM_LEDS);
-  FastLED.addLeds<WS2812B, 12, COLOR_ORDER>(leds[10], NUM_LEDS);
-  FastLED.addLeds<WS2812B, 13, COLOR_ORDER>(leds[11], NUM_LEDS);
-  FastLED.addLeds<WS2812B, 14, COLOR_ORDER>(leds[12], NUM_LEDS);
-  FastLED.addLeds<WS2812B, 15, COLOR_ORDER>(leds[13], NUM_LEDS);
-  FastLED.addLeds<WS2812B, 16, COLOR_ORDER>(leds[14], NUM_LEDS);
-  FastLED.addLeds<WS2812B, 17, COLOR_ORDER>(leds[15], NUM_LEDS);
-  FastLED.addLeds<WS2812B, 18, COLOR_ORDER>(leds[16], NUM_LEDS);
+//  FastLED.addLeds<WS2812B, 10, COLOR_ORDER>(leds[8], NUM_LEDS);
+//  FastLED.addLeds<WS2812B, 11, COLOR_ORDER>(leds[9], NUM_LEDS);
+//  FastLED.addLeds<WS2812B, 12, COLOR_ORDER>(leds[10], NUM_LEDS);
+//  FastLED.addLeds<WS2812B, 13, COLOR_ORDER>(leds[11], NUM_LEDS);
+//  FastLED.addLeds<WS2812B, 14, COLOR_ORDER>(leds[12], NUM_LEDS);
+//  FastLED.addLeds<WS2812B, 15, COLOR_ORDER>(leds[13], NUM_LEDS);
+//  FastLED.addLeds<WS2812B, 16, COLOR_ORDER>(leds[14], NUM_LEDS);
+//  FastLED.addLeds<WS2812B, 17, COLOR_ORDER>(leds[15], NUM_LEDS);
+//  FastLED.addLeds<WS2812B, 18, COLOR_ORDER>(leds[16], NUM_LEDS);
 //  FastLED.addLeds<WS2812B, 17, COLOR_ORDER>(leds[17], NUM_LEDS);
 //  FastLED.addLeds<WS2812B, 18, COLOR_ORDER>(leds[18], NUM_LEDS);
 //  FastLED.addLeds<WS2812B, 19, COLOR_ORDER>(leds[19], NUM_LEDS);
@@ -60,36 +60,18 @@ void loop() {
 
 void type0() {
   for (int i = 0; i < NUM_STRIPS; i++) {
-//    for ( int j = 0; j < NUM_LEDS; i++) {
-//      int r = random(255);
-//      int g = random(255);
-//      int b = random(255);
-//      leds[i][j] = CRGB(255, 255, 255);
-//    }
-    fill_solid(leds[i], NUM_LEDS, CRGB::White);
+    for ( int j = 0; j < NUM_LEDS; j++) {
+      int r = random(255);
+      int g = random(255);
+      int b = random(255);
+      leds[i][j] = CRGB(r, g, b);
+    }
+//    fill_solid(leds[i], NUM_LEDS, CRGB::White);
   }
   FastLED.setBrightness(150);
   FastLED.show();
 
   delay(1000);
-//  for (int i = 0; i < NUM_STRIPS; i++) {
-//    if (i == 0) {
-//      fill_solid(leds[i], 80, CRGB::Black);
-//    } else {
-//      fill_solid(leds[i], NUM_LEDS, CRGB::White);
-//    }
-//  }
-//  FastLED.setBrightness(128);
-//  FastLED.show();
-//
-//  for (int i = 0; i < 80; i++) {
-//    leds[0][i] = CRGB::White;
-//    leds[0][i + 1] = CRGB::White;
-//    FastLED.delay(33);
-//    leds[0][i] = CRGB::Black;
-//    leds[0][i + 1] = CRGB::Black;
-//  }
-//  FastLED[0].showLeds(128);
 }
 
 void type1() {
@@ -160,16 +142,16 @@ void lineAdding() {
   int b = random(255);
   for (int i = 0; i < NUM_STRIPS; i++) {
     fill_solid(leds[i], NUM_LEDS, CRGB(r, g, b));
-    FastLED[i].showLeds(128);
+    FastLED[i].showLeds(255);
     delay(10);
   }
-  delay(50);
+  delay(100);
   for (int i = 0; i < NUM_STRIPS; i++) {
     fill_solid(leds[i], NUM_LEDS, CRGB::Black);
-    FastLED[i].showLeds(128);
+    FastLED[i].showLeds(255);
     delay(10);
   }
-  delay(200);
+  delay(1000);
 }
 
 void sparking() {
