@@ -5,10 +5,10 @@
 #define STRIP_TYPE WS2812B
 #define COLOR_ORDER RGB
 
-#define NUM_STRIPS 8      // Two types of controller
+#define NUM_STRIPS 5      // Two types of controller
 //#define NUM_STRIPS 4
 
-#define NUM_LEDS 16
+#define NUM_LEDS 620
 
 #define BRIGHTNESS 128 // default brightness is 50%
 
@@ -23,7 +23,7 @@ State state = State_Init;
 
 CRGB leds[NUM_STRIPS][NUM_LEDS];
 
-const int maxQueueSize = (NUM_STRIPS * NUM_LEDS * 3 + 1) * 2;
+const int maxQueueSize = NUM_STRIPS * NUM_LEDS * 3 + 1;
 char queue[maxQueueSize];
 int front = -1, rear = -1;
 
@@ -36,30 +36,30 @@ void setup() {
     FastLED.addLeds<STRIP_TYPE, 4, COLOR_ORDER>(leds[2], NUM_LEDS);
     FastLED.addLeds<STRIP_TYPE, 5, COLOR_ORDER>(leds[3], NUM_LEDS);
     FastLED.addLeds<STRIP_TYPE, 6, COLOR_ORDER>(leds[4], NUM_LEDS);
-    FastLED.addLeds<STRIP_TYPE, 7, COLOR_ORDER>(leds[5], NUM_LEDS);
-    FastLED.addLeds<STRIP_TYPE, 8, COLOR_ORDER>(leds[6], NUM_LEDS);
-    FastLED.addLeds<STRIP_TYPE, 9, COLOR_ORDER>(leds[7], NUM_LEDS);
+//    FastLED.addLeds<STRIP_TYPE, 7, COLOR_ORDER>(leds[5], NUM_LEDS);
+//    FastLED.addLeds<STRIP_TYPE, 8, COLOR_ORDER>(leds[6], NUM_LEDS);
+//    FastLED.addLeds<STRIP_TYPE, 9, COLOR_ORDER>(leds[7], NUM_LEDS);
   } else {
     FastLED.addLeds<STRIP_TYPE, 2, COLOR_ORDER>(leds[0], NUM_LEDS);
     FastLED.addLeds<STRIP_TYPE, 3, COLOR_ORDER>(leds[1], NUM_LEDS);
     FastLED.addLeds<STRIP_TYPE, 4, COLOR_ORDER>(leds[2], NUM_LEDS);
     FastLED.addLeds<STRIP_TYPE, 5, COLOR_ORDER>(leds[3], NUM_LEDS);
   }
-  
+  FastLED.setBrightness(BRIGHTNESS);
 }
 
 void loop() {
-  boolean hasReadData = false;
-  while (Serial.available() > 0 && queueSize() < maxQueueSize) {
-    hasReadData = true;
+//  boolean hasReadData = false;
+  while (Serial.available() > 0 && queueSize() <= maxQueueSize) {
+//    hasReadData = true;
     enqueue(Serial.read());
   }
 
-  if (hasReadData) {
-    Serial.print("Total queue size: ");
-    Serial.print(queueSize());
-    Serial.print('\n');
-  }
+//  if (hasReadData) {
+//    Serial.print("Total queue size: ");
+//    Serial.print(queueSize());
+//    Serial.print('\n');
+//  }
 
   if (state == State_Init) {
     char startByte;
@@ -69,10 +69,6 @@ void loop() {
       } else if (startByte == '*') {
         state = State_ReadingFrame;
         processQueue();
-      } else {
-        Serial.print("Invalid start byte: ");
-        Serial.write(startByte);
-        Serial.print('\n');
       }
     }
   } else if (state == State_ReadingFrame) {
@@ -107,7 +103,6 @@ void showLeds(char * data) {
       data += 3;
     }
   }
-  FastLED.setBrightness(BRIGHTNESS);
   FastLED.show();
 }
 
@@ -156,7 +151,7 @@ boolean dequeueWithSize(char *data, unsigned int size) {
   if (rear - front + 1 >= size) {
     if (memcpy(data, &queue[front], size)) {
       front += size;
-      if (front - 1 == rear) {
+      if (front - 1 >= rear) {
         front = -1;
         rear = -1;
       }

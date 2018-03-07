@@ -1,10 +1,10 @@
 import processing.serial.*;
 
-final int TEENSY_NUM_STRIPS = 5;
+final int TEENSY_NUM_STRIPS = 2;
 final int TEENSY_NUM_LEDS = 620;
 final int BAUD_RATE = 921600;
 
-Teensy[] teensys = new Teensy[2];
+Teensy[] teensys = new Teensy[1];
 
 void setupTeensy() {
   println("Start to setup teensy...");
@@ -13,9 +13,9 @@ void setupTeensy() {
   println("Serial Ports List:");
   printArray(list);
   
-  teensys[0] = new Teensy(this, "/dev/cu.usbmodem3071001");
+  //teensys[0] = new Teensy(this, "/dev/cu.usbmodem3071001");
   //teensys[0] = new Teensy(this, "/dev/cu.usbmodem3654571");
-  teensys[1] = new Teensy(this, "/dev/cu.usbmodem3162511");
+  teensys[0] = new Teensy(this, "/dev/cu.usbmodem3162511");
   //teensys[0] = new Teensy(this, "/dev/cu.usbmodem2885451");
   
   println("Teensy setup done!");
@@ -60,10 +60,10 @@ class Teensy {
   Serial port;
   String portName;
   LedStrip[] ledStrips = new LedStrip[TEENSY_NUM_STRIPS];
-  byte[] data = new byte[TEENSY_NUM_STRIPS * 3 + 1];
+  byte[] data = new byte[TEENSY_NUM_STRIPS * TEENSY_NUM_LEDS * 3 + 1];
   
   SendDataThread sendThread;
-  RecieveDataThread recieveThread;
+  //RecieveDataThread recieveThread;
   
   
   Teensy(PApplet parent, String name) {
@@ -113,7 +113,7 @@ class Teensy {
     sendThread = new SendDataThread(name + "_send_thread", port);
     sendThread.start();
     
-    recieveThread = new RecieveDataThread(name + "_recieve_thread", port);
+    //recieveThread = new RecieveDataThread(name + "_recieve_thread", port);
     //recieveThread.start();
     
     println(name + " setup.");
@@ -135,16 +135,13 @@ class Teensy {
   void update(PImage image) {
     int offset = 1;
     for (LedStrip strip : ledStrips) {
-      color c = image.pixels[strip.offset];
-      if (lastImage != null) {
-        color lastC = lastImage.pixels[strip.offset];
-        if (lastC != c) {
-          isSame = false;
-        }
+      for (int y = 0; y < SCREEN_HEIGHT; y++) {
+        int index = strip.offset + y * SCREEN_WIDTH;
+        color c = image.pixels[index];
+        data[offset++] = (byte)(c >> 16 & 0xFF);
+        data[offset++] = (byte)(c >> 8 & 0xFF);
+        data[offset++] = (byte)(c & 0xFF);
       }
-      data[offset++] = (byte)(c >> 16 & 0xFF);
-      data[offset++] = (byte)(c >> 8 & 0xFF);
-      data[offset++] = (byte)(c & 0xFF);
     }
   }
 }
