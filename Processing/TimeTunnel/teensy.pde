@@ -15,8 +15,8 @@ void setupTeensy() {
   
   //teensys[0] = new Teensy(this, "/dev/cu.usbmodem3071001");
   //teensys[0] = new Teensy(this, "/dev/cu.usbmodem3654571");
-  //teensys[0] = new Teensy(this, "/dev/cu.usbmodem3162511");
-  teensys[0] = new Teensy(this, "/dev/cu.usbmodem2885451");
+  teensys[0] = new Teensy(this, "/dev/cu.usbmodem3162511");
+  //teensys[0] = new Teensy(this, "/dev/cu.usbmodem2885451");
   
   println("Teensy setup done!");
   println();
@@ -120,26 +120,23 @@ class Teensy {
     println();
   }
   
-  PImage lastImage;
-  boolean isSame = true;
+  //PImage lastImage;
+  //boolean isSame = true;
   public void send(PImage image) {
     update(image);
     data[0] = '*';
-    //if (!isSame) {
-      sendThread.send(data);
-    //}
-    isSame = true;
-    lastImage = image;
+    port.write(data);
+    //sendThread.send(data);
   }
   
-  public void disconnect() {
-    sendThread.done();
-    recieveThread.done();
-    port.write('!');
-    delay(100);
-    String response = port.readStringUntil('\n');
-    println("Disconnect teensy: " + response);
-  }
+  //public void disconnect() {
+  //  sendThread.done();
+  //  recieveThread.done();
+  //  port.write('!');
+  //  delay(100);
+  //  String response = port.readStringUntil('\n');
+  //  println("Disconnect teensy: " + response);
+  //}
   
   private void update(PImage image) {
     int offset = 1;

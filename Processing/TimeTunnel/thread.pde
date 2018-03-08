@@ -32,7 +32,7 @@ class SendDataThread extends Thread {
     super.start();
   }
 
-  synchronized void send(byte[] data) {
+  void send(byte[] data) {
     this.data = data;
     sendData = true;
   }
@@ -46,13 +46,14 @@ class SendDataThread extends Thread {
   }
 
   void run() {
+    
     while (running) {
       if (sendData) {
-        //println(name + " send data: " + bytesToHex(data));
-        int stime = millis();
+        //println(millis() + ", " + name + " send data: " + bytesToHex(data));
         sendData = false;
-        port.write(data);  // send data over serial to teensy
-        send_time = millis() - stime;
+        synchronized(this) {
+          port.write(data);  // send data over serial to teensy
+        }
       } else {
         yield();
       }

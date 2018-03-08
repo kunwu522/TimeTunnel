@@ -41,6 +41,7 @@ void draw() {
   } else {
     simulateSendMessageToTeensys(display);
   }
+  //delay(50);
 }
 
 //void exit() {
