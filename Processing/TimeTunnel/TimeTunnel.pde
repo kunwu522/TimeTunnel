@@ -3,7 +3,7 @@ import java.io.*;
 
 static int SCREEN_WIDTH = 260;
 static int SCREEN_HEIGHT = 620;
-final int NUM_STRIPS = 2;
+final int NUM_STRIPS = 5;
 final int NUM_LEDS_PER_STRIP = 620;
 
 final boolean launchTeensy = true;
@@ -42,3 +42,16 @@ void draw() {
     simulateSendMessageToTeensys(display);
   }
 }
+
+//void exit() {
+//  for (Teensy teensy : teensys) {
+//    if (teensy != null) teensy.disconnect();
+//  }
+//  println("Time Tunnel exit.");
+//  super.exit();
+//}
+
+//void stop() {
+//  println("Time Tunnel stop.");
+//  super.stop();
+//}

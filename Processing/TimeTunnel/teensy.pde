@@ -1,6 +1,6 @@
 import processing.serial.*;
 
-final int TEENSY_NUM_STRIPS = 2;
+final int TEENSY_NUM_STRIPS = 5;
 final int TEENSY_NUM_LEDS = 620;
 final int BAUD_RATE = 921600;
 
@@ -15,8 +15,8 @@ void setupTeensy() {
   
   //teensys[0] = new Teensy(this, "/dev/cu.usbmodem3071001");
   //teensys[0] = new Teensy(this, "/dev/cu.usbmodem3654571");
-  teensys[0] = new Teensy(this, "/dev/cu.usbmodem3162511");
-  //teensys[0] = new Teensy(this, "/dev/cu.usbmodem2885451");
+  //teensys[0] = new Teensy(this, "/dev/cu.usbmodem3162511");
+  teensys[0] = new Teensy(this, "/dev/cu.usbmodem2885451");
   
   println("Teensy setup done!");
   println();
@@ -63,7 +63,7 @@ class Teensy {
   byte[] data = new byte[TEENSY_NUM_STRIPS * TEENSY_NUM_LEDS * 3 + 1];
   
   SendDataThread sendThread;
-  //RecieveDataThread recieveThread;
+  RecieveDataThread recieveThread;
   
   
   Teensy(PApplet parent, String name) {
@@ -74,7 +74,7 @@ class Teensy {
         println("Error, port is null.");
         throw new NullPointerException();
       }
-      port.bufferUntil('\n');
+      //port.bufferUntil('\n');
       port.write('?');
     } catch (Throwable e) {
       println("Serial Port " + portName + " does not exist.");
@@ -113,8 +113,8 @@ class Teensy {
     sendThread = new SendDataThread(name + "_send_thread", port);
     sendThread.start();
     
-    //recieveThread = new RecieveDataThread(name + "_recieve_thread", port);
-    //recieveThread.start();
+    recieveThread = new RecieveDataThread(name + "_recieve_thread", port);
+    recieveThread.start();
     
     println(name + " setup.");
     println();
@@ -122,7 +122,7 @@ class Teensy {
   
   PImage lastImage;
   boolean isSame = true;
-  void send(PImage image) {
+  public void send(PImage image) {
     update(image);
     data[0] = '*';
     //if (!isSame) {
@@ -132,7 +132,16 @@ class Teensy {
     lastImage = image;
   }
   
-  void update(PImage image) {
+  public void disconnect() {
+    sendThread.done();
+    recieveThread.done();
+    port.write('!');
+    delay(100);
+    String response = port.readStringUntil('\n');
+    println("Disconnect teensy: " + response);
+  }
+  
+  private void update(PImage image) {
     int offset = 1;
     for (LedStrip strip : ledStrips) {
       for (int y = 0; y < SCREEN_HEIGHT; y++) {

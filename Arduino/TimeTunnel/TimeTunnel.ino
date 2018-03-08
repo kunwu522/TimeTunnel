@@ -23,9 +23,11 @@ State state = State_Init;
 
 CRGB leds[NUM_STRIPS][NUM_LEDS];
 
-const int maxQueueSize = NUM_STRIPS * NUM_LEDS * 3 + 1;
+const int maxQueueSize = (NUM_STRIPS * NUM_LEDS * 3 + 1) * 3;
 char queue[maxQueueSize];
 int front = -1, rear = -1;
+
+unsigned int waitingDataCount = 0;
 
 void setup() {
   Serial.setTimeout(50);
@@ -49,17 +51,11 @@ void setup() {
 }
 
 void loop() {
-//  boolean hasReadData = false;
+  int readCount = 0;
   while (Serial.available() > 0 && queueSize() <= maxQueueSize) {
-//    hasReadData = true;
     enqueue(Serial.read());
+    readCount++;
   }
-
-//  if (hasReadData) {
-//    Serial.print("Total queue size: ");
-//    Serial.print(queueSize());
-//    Serial.print('\n');
-//  }
 
   if (state == State_Init) {
     char startByte;
@@ -69,15 +65,26 @@ void loop() {
       } else if (startByte == '*') {
         state = State_ReadingFrame;
         processQueue();
+      } else if (startByte == '!') {
+        disconnecting();
       }
     }
   } else if (state == State_ReadingFrame) {
     processQueue();
+    if (readCount == 0) {
+      waitingDataCount++;
+      if (waitingDataCount > 100) {
+        state = State_Init;
+        waitingDataCount = 0;
+      }
+    }
   }
-  
 }
 
 void processQueue() {
+  Serial.print("Start to update leds.");
+  Serial.print("\n");
+  
   if (queueSize() < NUM_STRIPS * NUM_LEDS * 3) {
     return;
   }
@@ -102,8 +109,8 @@ void showLeds(char * data) {
       leds[i][j] = CRGB(data[0], data[1], data[2]);
       data += 3;
     }
+    FastLED[i].showLeds(BRIGHTNESS);
   }
-  FastLED.show();
 }
 
 void sendTeensyInfo() {
@@ -117,6 +124,12 @@ void sendTeensyInfo() {
   Serial.print(NUM_STRIPS);
   Serial.write(',');
   Serial.print(NUM_LEDS);
+  Serial.print('\n');
+}
+
+void disconnecting() {
+  Serial.print(TEENSY_ID);
+  Serial.print(", disconnected.");
   Serial.print('\n');
 }
 

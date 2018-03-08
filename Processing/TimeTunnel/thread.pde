@@ -48,7 +48,7 @@ class SendDataThread extends Thread {
   void run() {
     while (running) {
       if (sendData) {
-        println(name + " send data: " + bytesToHex(data));
+        //println(name + " send data: " + bytesToHex(data));
         int stime = millis();
         sendData = false;
         port.write(data);  // send data over serial to teensy
@@ -84,7 +84,7 @@ class RecieveDataThread extends Thread {
       if (port.available() > 0) {
         String response = port.readStringUntil('\n');
         if (response != null) {
-          println(name + " response: " + response);
+          println(millis() + ", " + name + " response: " + response);
         }
       }
       delay(100);
