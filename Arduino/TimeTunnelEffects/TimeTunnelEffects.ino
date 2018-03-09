@@ -2,7 +2,7 @@
 
 #define COLOR_ORDER GRB
 
-#define NUM_STRIPS 5
+#define NUM_STRIPS 12
 #define NUM_LEDS 620
 
 CRGB leds[NUM_STRIPS][NUM_LEDS];
@@ -18,13 +18,13 @@ void setup() {
   FastLED.addLeds<WS2812B, 4, COLOR_ORDER>(leds[2], NUM_LEDS);
   FastLED.addLeds<WS2812B, 5, COLOR_ORDER>(leds[3], NUM_LEDS);
   FastLED.addLeds<WS2812B, 6, COLOR_ORDER>(leds[4], NUM_LEDS);
-//  FastLED.addLeds<WS2812B, 7, COLOR_ORDER>(leds[5], NUM_LEDS);
-//  FastLED.addLeds<WS2812B, 8, COLOR_ORDER>(leds[6], NUM_LEDS);
-//  FastLED.addLeds<WS2812B, 9, COLOR_ORDER>(leds[7], NUM_LEDS);
-//  FastLED.addLeds<WS2812B, 10, COLOR_ORDER>(leds[8], NUM_LEDS);
-//  FastLED.addLeds<WS2812B, 11, COLOR_ORDER>(leds[9], NUM_LEDS);
-//  FastLED.addLeds<WS2812B, 12, COLOR_ORDER>(leds[10], NUM_LEDS);
-//  FastLED.addLeds<WS2812B, 13, COLOR_ORDER>(leds[11], NUM_LEDS);
+  FastLED.addLeds<WS2812B, 7, COLOR_ORDER>(leds[5], NUM_LEDS);
+  FastLED.addLeds<WS2812B, 8, COLOR_ORDER>(leds[6], NUM_LEDS);
+  FastLED.addLeds<WS2812B, 9, COLOR_ORDER>(leds[7], NUM_LEDS);
+  FastLED.addLeds<WS2812B, 10, COLOR_ORDER>(leds[8], NUM_LEDS);
+  FastLED.addLeds<WS2812B, 11, COLOR_ORDER>(leds[9], NUM_LEDS);
+  FastLED.addLeds<WS2812B, 12, COLOR_ORDER>(leds[10], NUM_LEDS);
+  FastLED.addLeds<WS2812B, 13, COLOR_ORDER>(leds[11], NUM_LEDS);
 //  FastLED.addLeds<WS2812B, 14, COLOR_ORDER>(leds[12], NUM_LEDS);
 //  FastLED.addLeds<WS2812B, 15, COLOR_ORDER>(leds[13], NUM_LEDS);
 //  FastLED.addLeds<WS2812B, 16, COLOR_ORDER>(leds[14], NUM_LEDS);
@@ -60,18 +60,15 @@ void loop() {
 
 void type0() {
   for (int i = 0; i < NUM_STRIPS; i++) {
-//    for ( int j = 0; j < NUM_LEDS; j++) {
-//      int r = random(255);
-//      int g = random(255);
-//      int b = random(255);
-//      leds[i][j] = CRGB(r, g, b);
-//    }
-    fill_solid(leds[i], NUM_LEDS, CRGB::White);
+    int r = random(255);
+    int g = random(255);
+    int b = random(255);
+    fill_solid(leds[i], NUM_LEDS, CRGB(r, g, b));
   }
   FastLED.setBrightness(150);
   FastLED.show();
 
-  delay(1000);
+  delay(2000);
 }
 
 void type1() {

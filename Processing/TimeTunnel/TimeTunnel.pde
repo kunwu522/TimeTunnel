@@ -3,20 +3,18 @@ import java.io.*;
 
 static int SCREEN_WIDTH = 512;
 static int SCREEN_HEIGHT = 620;
-final int NUM_STRIPS = 5;
+final int NUM_STRIPS = 10;
 final int NUM_LEDS_PER_STRIP = 620;
 
 final boolean launchTeensy = true;
 
-float x1;
-float x2;
-
 PGraphics canvas;
 
 void setup() {
-  size(512, 1044, P3D);
-  canvas = createGraphics(SCREEN_WIDTH, SCREEN_HEIGHT, P3D);
+  size(512, 620);
   setupStrips();
+  canvas = createGraphics(SCREEN_WIDTH, SCREEN_HEIGHT);
+  setupKinect();
   if (launchTeensy) {
     setupTeensy();
   } else {
@@ -26,16 +24,15 @@ void setup() {
 
 void draw() {
   drawKinect();
-  
   canvas.beginDraw();
   canvas.background(169, 169, 169);
   drawStrips();
-  drawCursor();
+  drawMode();
   canvas.endDraw();
   
   image(canvas, 0, 0);
   
-  PImage display = get();
+  PImage display = get(0, 0, 512, 620);
   if (launchTeensy) {
     for (Teensy teensy : teensys) {
       teensy.send(display);

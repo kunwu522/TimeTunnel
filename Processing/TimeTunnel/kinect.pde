@@ -13,7 +13,7 @@ PImage display;
 PImage previous;
 
 final int KINECT_WIDTH = 512;
-final int KINECT_HEIGHT = 512;
+final int KINECT_HEIGHT = 424;
 
 void setupKinect() {
   kinect2 = new Kinect2(this);
@@ -25,6 +25,7 @@ void setupKinect() {
     background = createImage(KINECT_WIDTH, KINECT_HEIGHT, RGB);
   }
   display = createImage(KINECT_WIDTH, KINECT_HEIGHT, RGB);
+  smoothImage = createImage(KINECT_WIDTH, KINECT_HEIGHT, RGB);
 }
 
 void drawKinect() {
@@ -41,13 +42,15 @@ void drawKinect() {
       smoothImage.pixels[index] = color( 255 * rate, 255 * rate, 255 * rate);
     }
   }
+  smoothImage.updatePixels();
+  //image(smoothImage, 0, 620);
   buildDisplayImage(smoothImage);
-  image(display, 0, 620);
+  //image(display, 512, 620);
   
   blobDetection(display);
   
-  fill(0, 255, 0);
-  ellipse(averageX, averageY + 620, 20, 20);
+  //fill(0, 255, 0);
+  //ellipse(averageX + 512, averageY + 620, 20, 20);
 }
 
 /******************************

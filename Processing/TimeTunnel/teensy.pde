@@ -4,7 +4,7 @@ final int TEENSY_NUM_STRIPS = 5;
 final int TEENSY_NUM_LEDS = 620;
 final int BAUD_RATE = 921600;
 
-Teensy[] teensys = new Teensy[1];
+Teensy[] teensys = new Teensy[2];
 
 void setupTeensy() {
   println("Start to setup teensy...");
@@ -16,7 +16,7 @@ void setupTeensy() {
   //teensys[0] = new Teensy(this, "/dev/cu.usbmodem3071001");
   //teensys[0] = new Teensy(this, "/dev/cu.usbmodem3654571");
   teensys[0] = new Teensy(this, "/dev/cu.usbmodem3162511");
-  //teensys[0] = new Teensy(this, "/dev/cu.usbmodem2885451");
+  teensys[1] = new Teensy(this, "/dev/cu.usbmodem2885451");
   
   println("Teensy setup done!");
   println();
@@ -90,16 +90,16 @@ class Teensy {
       return;
     }
     String param[] = line.split(",");
-    if (param.length != 4) {
+    if (param.length != 3) {
       println("Error, port " + portName + " invalid reponse: " + line);
       exit();
       return;
     }
     println("Response: " + line);
     id = Integer.parseInt(param[0]);
-    name = param[1];
-    int stripsNum = Integer.parseInt(param[2]);
-    int ledsNum = Integer.parseInt(param[3].trim());
+    name = "teensy" + id;
+    int stripsNum = Integer.parseInt(param[1]);
+    int ledsNum = Integer.parseInt(param[2].trim());
     if (stripsNum != TEENSY_NUM_STRIPS || ledsNum != TEENSY_NUM_LEDS) {
       println("Error -- teensy: " + name + ", the number of leds and strips is not match.");
       exit();
@@ -114,7 +114,7 @@ class Teensy {
     sendThread.start();
     
     recieveThread = new RecieveDataThread(name + "_recieve_thread", port);
-    recieveThread.start();
+    //recieveThread.start();
     
     println(name + " setup.");
     println();
@@ -125,8 +125,8 @@ class Teensy {
   public void send(PImage image) {
     update(image);
     data[0] = '*';
-    port.write(data);
-    //sendThread.send(data);
+    //port.write(data);
+    sendThread.send(data);
   }
   
   //public void disconnect() {

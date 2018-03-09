@@ -34,11 +34,11 @@ void setup() {
 //  Serial.setTimeout(50);
 
   if (TEENSY_ID < 2) {
-    FastLED.addLeds<STRIP_TYPE, 2, COLOR_ORDER>(leds[0], NUM_LEDS);
-    FastLED.addLeds<STRIP_TYPE, 3, COLOR_ORDER>(leds[1], NUM_LEDS);
+    FastLED.addLeds<STRIP_TYPE, 6, COLOR_ORDER>(leds[0], NUM_LEDS);
+    FastLED.addLeds<STRIP_TYPE, 5, COLOR_ORDER>(leds[1], NUM_LEDS);
     FastLED.addLeds<STRIP_TYPE, 4, COLOR_ORDER>(leds[2], NUM_LEDS);
-    FastLED.addLeds<STRIP_TYPE, 5, COLOR_ORDER>(leds[3], NUM_LEDS);
-    FastLED.addLeds<STRIP_TYPE, 6, COLOR_ORDER>(leds[4], NUM_LEDS);
+    FastLED.addLeds<STRIP_TYPE, 3, COLOR_ORDER>(leds[3], NUM_LEDS);
+    FastLED.addLeds<STRIP_TYPE, 2, COLOR_ORDER>(leds[4], NUM_LEDS);
 //    FastLED.addLeds<STRIP_TYPE, 7, COLOR_ORDER>(leds[5], NUM_LEDS);
 //    FastLED.addLeds<STRIP_TYPE, 8, COLOR_ORDER>(leds[6], NUM_LEDS);
 //    FastLED.addLeds<STRIP_TYPE, 9, COLOR_ORDER>(leds[7], NUM_LEDS);
@@ -145,11 +145,6 @@ void showLeds(char * data) {
 
 void sendTeensyInfo() {
   Serial.print(TEENSY_ID);
-  Serial.write(',');
-//  char teensyName[strlen("teensyx")];
-//  strcat(teensyName, "teensy");
-//  teensyName[strlen("teensyx") - 1] = TEENSY_ID + '0';
-  Serial.print("teensy0");
   Serial.write(',');
   Serial.print(NUM_STRIPS);
   Serial.write(',');
