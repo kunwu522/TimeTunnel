@@ -1,3 +1,6 @@
+int averageX = 0;
+int averageY = 0;
+
 void drawMode() {
   int mode = 0;
   switch (mode) {
@@ -13,7 +16,7 @@ void drawMode() {
 }
 
 void drawCursor() {
-  x1 = lerp(x1, mouseX, 0.1);
+  x1 = lerp(x1, averageX, 0.1);
   x2 = lerp(x2, x1, 0.1);
   
   canvas.noStroke();
