@@ -7,38 +7,42 @@ final int NUM_STRIPS = 10;
 final int NUM_LEDS_PER_STRIP = 620;
 
 final boolean launchTeensy = true;
+final boolean launchKinect = false;
 
-PGraphics canvas;
+//PGraphics canvas;
 
 void setup() {
   size(512, 620);
   setupStrips();
-  canvas = createGraphics(SCREEN_WIDTH, SCREEN_HEIGHT);
+  //canvas = createGraphics(SCREEN_WIDTH, SCREEN_HEIGHT);
+  if (launchKinect) {
+    setupKinect();
+  }
   setupKinect();
   if (launchTeensy) {
     setupTeensy();
-  } else {
-    setupSimulateThread();
   }
 }
 
 void draw() {
-  drawKinect();
-  canvas.beginDraw();
-  canvas.background(169, 169, 169);
+  background(169, 169, 169);
+  if (launchKinect) {
+    drawKinect();
+  }
   drawStrips();
   drawMode();
-  canvas.endDraw();
+  //canvas.beginDraw();
+  //drawStrips();
+  //drawMode();
+  //canvas.endDraw();
   
-  image(canvas, 0, 0);
+  //image(canvas, 0, 0);
   
-  PImage display = get(0, 0, 512, 620);
   if (launchTeensy) {
+    PImage display = get(0, 0, 512, 620);
     for (Teensy teensy : teensys) {
       teensy.send(display);
     }
-  } else {
-    simulateSendMessageToTeensys(display);
   }
   //delay(50);
 }

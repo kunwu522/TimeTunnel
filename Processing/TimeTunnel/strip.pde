@@ -14,7 +14,8 @@ void setupStrips() {
 
 void drawStrips() {
   for (LedStrip strip : strips) {
-    strip.drawStrip(canvas);
+    strip.drawStrip();
+    //strip.drawStrip(canvas);
   }
   //for (Teensy teensy : teensys) {
   //  for (LedStrip strip : teensy.ledStrips) {
@@ -40,6 +41,13 @@ class LedStrip {
     canvas.stroke(0, 0, 0);
     canvas.strokeWeight(2);
     canvas.line(offset, 0, offset, SCREEN_HEIGHT);
+  }
+  
+  public void drawStrip() {
+    noFill();
+    stroke(0);
+    strokeWeight(2);
+    line(offset, 0, offset, SCREEN_HEIGHT);
   }
   
   private boolean isEqualColorWithThreshold(color c1, color c2) {

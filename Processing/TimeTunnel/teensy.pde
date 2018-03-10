@@ -22,45 +22,14 @@ void setupTeensy() {
   println();
 }
 
-SimulateThread t1;
-SimulateThread t2;
-void setupSimulateThread() {
-  t1 = new SimulateThread("fake1");
-  t2 = new SimulateThread("fake2");
-  t1.start();
-  t2.start();
-}
-
-void simulateSendMessageToTeensys(PImage image) {
-  byte[] data = new byte[NUM_STRIPS * NUM_LEDS_PER_STRIP * 3 + 1];
-  data[0] = '*';
-  int offset = 1;
-  for (int s = 0; s < strips.length; s++) {
-    LedStrip strip = strips[s];
-    int x = strip.offset;
-    for (int y = 0; y < SCREEN_HEIGHT; y++) {
-      int index = x + y * SCREEN_WIDTH;
-      color c = image.pixels[index];
-      data[offset++] = (byte)(c >> 16 & 0xFF);
-      data[offset++] = (byte)(c >> 8 & 0xFF);
-      data[offset++] = (byte)(c & 0xFF);
-    }
-    if (s < 4) {
-      t1.send(data);
-    } else {
-      t2.send(data);
-    }
-  }
-  //t1.send()
-}
-
 class Teensy {
   int id;
   String name;
   Serial port;
   String portName;
   LedStrip[] ledStrips = new LedStrip[TEENSY_NUM_STRIPS];
-  byte[] data = new byte[TEENSY_NUM_STRIPS * TEENSY_NUM_LEDS * 3 + 1];
+  //byte[] data = new byte[TEENSY_NUM_STRIPS * TEENSY_NUM_LEDS * 3 + 1];
+  byte[] data = new byte[TEENSY_NUM_STRIPS * 3 + 1];
   
   SendDataThread sendThread;
   RecieveDataThread recieveThread;
@@ -114,7 +83,7 @@ class Teensy {
     sendThread.start();
     
     recieveThread = new RecieveDataThread(name + "_recieve_thread", port);
-    //recieveThread.start();
+    recieveThread.start();
     
     println(name + " setup.");
     println();
@@ -141,13 +110,18 @@ class Teensy {
   private void update(PImage image) {
     int offset = 1;
     for (LedStrip strip : ledStrips) {
-      for (int y = 0; y < SCREEN_HEIGHT; y++) {
-        int index = strip.offset + y * SCREEN_WIDTH;
-        color c = image.pixels[index];
-        data[offset++] = (byte)(c >> 16 & 0xFF);
-        data[offset++] = (byte)(c >> 8 & 0xFF);
-        data[offset++] = (byte)(c & 0xFF);
-      }
+      //for (int y = 0; y < SCREEN_HEIGHT; y++) { //All pixels
+      //  int index = strip.offset + y * SCREEN_WIDTH;
+      //  color c = image.pixels[index];
+      //  data[offset++] = (byte)(c >> 16 & 0xFF);
+      //  data[offset++] = (byte)(c >> 8 & 0xFF);
+      //  data[offset++] = (byte)(c & 0xFF);
+      //}
+      int index = strip.offset;
+      color c = image.pixels[index];
+      data[offset++] = (byte)(c >> 16 & 0xFF);
+      data[offset++] = (byte)(c >> 8 & 0xFF);
+      data[offset++] = (byte)(c & 0xFF);
     }
   }
 }
