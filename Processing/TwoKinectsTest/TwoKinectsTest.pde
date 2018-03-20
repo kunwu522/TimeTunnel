@@ -13,9 +13,6 @@ final int KINECT_HEIGHT = 424;
 Kinect2 kinect2a;
 Kinect2 kinect2b;
 
-int objectX = 0;
-int objectY = 0;
-
 PImage background;
 
 void setup() {
@@ -42,43 +39,23 @@ void setup() {
 
   background = loadImage("image/background.jpg");
   if (background == null) {
-    background = createImage(KINECT_WIDTH * 2,KINECT_HEIGHT,RGB);
+    background = createImage(1024,424,RGB);
   }
 }
 
+int mode = 0;
 void draw() {
-  background(0);
-  int[] rawDepth1 = kinect2a.getRawDepth();
-  int[] rawDepth2 = kinect2b.getRawDepth();
-  int[] rawDepth = new int[rawDepth1.length + rawDepth2.length];
-  int t1 = millis();
-  for (int x = 0; x < KINECT_WIDTH * 2; x++) {
-    for (int y = 0; y < KINECT_HEIGHT; y++) {
-      int index = x + y * KINECT_WIDTH * 2;
-      if (x < KINECT_WIDTH) {
-        int index1 = x + y * KINECT_WIDTH;
-        rawDepth[index] = rawDepth1[index1];
-      } else {
-        int index2 = (x - KINECT_WIDTH) + y * KINECT_WIDTH;
-        rawDepth[index] = rawDepth2[index2];
-      }
-    }
+  int mode = 0;
+  switch (mode) {
+    case 0:
+      recordKinect();
+      break;
+    case 1:
+      displayKinectSmoothDepth();
+      break;
+    default:
+      break;
   }
-  int t2 = millis();
-  PImage smoothImage = getDenoisedDepthImage(rawDepth);
-  if (saveBackground) {
-    background = smoothImage;
-    background.save("image/background.jpg");
-    saveBackground = false;
-  }
-  int t3 = millis();
-  detectBlob(smoothImage);
-  int t4 = millis();
-  //image(smoothImage,0,0);
-  fill(0, 0, 255);
-  noStroke();
-  ellipse(objectX, objectY, 20, 20);
-  println("Merge depth: " + (t2 - t1) + ", denoise: " + (t3 - t2) + ", detection: " + (t4 - t3));
 }
 
 boolean checkKinect(Kinect2 kinect2) {
