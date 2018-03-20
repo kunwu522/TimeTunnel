@@ -47,14 +47,16 @@ void draw() {
   int[] rawDepth1 = kinect2a.getRawDepth();
   int[] rawDepth2 = kinect2b.getRawDepth();
   int[] rawDepth = new int[rawDepth1.length + rawDepth2.length];
-  for (int i = 0; i < rawDepth.length; i++) {
-    int x = i % KINECT_WIDTH;
-    int y = (i - x) / KINECT_WIDTH;
-    if (x < KINECT_WIDTH) {
-      rawDepth[i] = kinect2a.getRawDepth[x + y * KINECT_WIDTH];
-    } else {
-      x = x - KINECT_WIDTH;
-      rawDepth[i] = kinect2b.getRawDepth[x + y * KINECT_WIDTH];
+  for (int x = 0; x < KINECT_WIDTH * 2; x++) {
+    for (int y = 0; y < KINECT_HEIGHT; y++) {
+      int index = x + y * KINECT_WIDTH * 2;
+      if (x < KINECT_WIDTH) {
+        int index1 = x + y * KINECT_WIDTH;
+        rawDepth[index] = rawDepth1[index1];
+      } else {
+        int index2 = (x - KINECT_WIDTH) + y * KINECT_WIDTH;
+        rawDepth[index] = rawDepth2[index2];
+      }
     }
   }
   PImage smoothImage = getDenoisedDepthImage(rawDepth);
