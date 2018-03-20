@@ -2,14 +2,14 @@ int innerBandThreshold = 3;
 int outerBandThreshold = 5;
 int avarageThreshold = 30;
 PImage getDenoisedDepthImage(int[] rawDepth) {
-  PImage image = createImage(TUNNEL_WIDTH,TUNNEL_HEIGHT,RGB);
-  int widthBound = TUNNEL_WIDTH - 1;
-  int heightBound = TUNNEL_HEIGHT - 1;
+  PImage image = createImage(KINECT_WIDTH * 2,KINECT_HEIGHT,RGB);
+  int widthBound = (KINECT_WIDTH * 2) - 1;
+  int heightBound = KINECT_HEIGHT - 1;
   image.loadPixels();
-  for (int x = 0; x < TUNNEL_WIDTH; x++) {
-    for (int y = 0; y < TUNNEL_HEIGHT; y++) {
+  for (int x = 0; x < (KINECT_WIDTH * 2); x++) {
+    for (int y = 0; y < KINECT_HEIGHT; y++) {
       int smoothDepth = 0;
-      int offset = x + y * TUNNEL_WIDTH;
+      int offset = x + y * (KINECT_WIDTH * 2);
       if (rawDepth[offset] == 0) {
         Map<Integer, Integer> frequencyMap = new HashMap<Integer, Integer>();
         int innerBandCount = 0;
@@ -20,7 +20,7 @@ PImage getDenoisedDepthImage(int[] rawDepth) {
             int nearY = y + j;
             if (nearX >=0 && nearX <= widthBound
                 && nearY >=0 && nearY <= heightBound) {
-              int index = nearX + nearY * TUNNEL_WIDTH;
+              int index = nearX + nearY * (KINECT_WIDTH * 2);
               if (rawDepth[index] != 0) {
                 Integer depth = Integer.valueOf(rawDepth[index]);
                 if (frequencyMap.containsKey(depth)) {
@@ -87,8 +87,8 @@ void detectBlob(PImage image) {
   int sumY = 0;
   int count = 0;
   boolean foundBlob = false;
-  for (int x = 0; x < TUNNEL_WIDTH; x++) {
-    for (int y = 0; y < TUNNEL_WIDTH; y++) {
+  for (int x = 0; x < (KINECT_WIDTH * 2); x++) {
+    for (int y = 0; y < KINECT_HEIGHT; y++) {
       if (isBlobDiff(background, image, x, y, 5)) {
         sumX += x;
         sumY += y;
@@ -115,9 +115,9 @@ boolean isBlobDiff(PImage background, PImage image, int x, int y, int threshold)
     for (int j = -threshold; j <= threshold; j++) {
       int nearX = x + i;
       int nearY = y + j;
-      if (nearX >= 0 && nearX < TUNNEL_WIDTH
-        && nearY >= 0 && nearY < TUNNEL_WIDTH) {
-        int nearIndex = nearX + nearY * TUNNEL_WIDTH;
+      if (nearX >= 0 && nearX < (KINECT_WIDTH * 2)
+        && nearY >= 0 && nearY < KINECT_HEIGHT) {
+        int nearIndex = nearX + nearY * (KINECT_WIDTH * 2);
         color bgColor = background.pixels[nearIndex];
         color currentColor = image.pixels[nearIndex];
         if (diffColor(bgColor, currentColor) < 30 * 30) {
