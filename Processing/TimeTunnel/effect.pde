@@ -7,7 +7,7 @@ int x2;
 void drawMode() {
   int mode = 0;
   switch (mode) {
-    case 0: 
+    case 0:
       drawCursor();
       break;
     case 1:
@@ -34,7 +34,7 @@ void drawCursor() {
   x1 = (int)lerp(x1, x, 0.05); //<>//
   //println("blob x: " + averageX);
   x2 = (int)lerp(x2, x1, 0.1);
-  
+
   noStroke();
   //float gradient = 2;
   float tempWidth = abs(x1 - x2) > 20 ? abs(x1 - x2) : 20;

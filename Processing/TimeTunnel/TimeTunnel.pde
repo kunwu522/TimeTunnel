@@ -6,8 +6,8 @@ static int SCREEN_HEIGHT = 620;
 final int NUM_STRIPS = 10;
 final int NUM_LEDS_PER_STRIP = 620;
 
-final boolean launchTeensy = true;
-final boolean launchKinect = false;
+final boolean launchTeensy = false;
+final boolean launchKinect = true;
 
 //PGraphics canvas;
 
@@ -31,13 +31,7 @@ void draw() {
   }
   drawStrips();
   drawMode();
-  //canvas.beginDraw();
-  //drawStrips();
-  //drawMode();
-  //canvas.endDraw();
-  
-  //image(canvas, 0, 0);
-  
+
   if (launchTeensy) {
     PImage display = get(0, 0, 512, 620);
     for (Teensy teensy : teensys) {

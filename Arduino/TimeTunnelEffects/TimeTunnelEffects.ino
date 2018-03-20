@@ -63,9 +63,9 @@ void type0() {
     int r = random(255);
     int g = random(255);
     int b = random(255);
-    fill_solid(leds[i], NUM_LEDS, CRGB(r, g, b));
+    fill_solid(leds[i], NUM_LEDS, CRGB(0, 0, 0));
   }
-  FastLED.setBrightness(150);
+  FastLED.setBrightness(128);
   FastLED.show();
 
   delay(2000);
@@ -139,7 +139,7 @@ void lineAdding() {
   int b = random(255);
   for (int i = 0; i < NUM_STRIPS; i++) {
     fill_solid(leds[i], NUM_LEDS, CRGB(r, g, b));
-    FastLED[i].showLeds(255);
+    FastLED[i].showLeds(128);
     delay(10);
   }
   delay(100);

@@ -1,9 +1,31 @@
-import org.openkinect.freenect.*;
-import org.openkinect.freenect2.*;
-import org.openkinect.processing.*;
-import org.openkinect.tests.*;
+import processing.core.*; 
+import processing.data.*; 
+import processing.event.*; 
+import processing.opengl.*; 
 
-import java.util.*;
+import org.openkinect.freenect.*; 
+import org.openkinect.freenect2.*; 
+import org.openkinect.processing.*; 
+import org.openkinect.tests.*; 
+import java.util.*; 
+
+import java.util.HashMap; 
+import java.util.ArrayList; 
+import java.io.File; 
+import java.io.BufferedReader; 
+import java.io.PrintWriter; 
+import java.io.InputStream; 
+import java.io.OutputStream; 
+import java.io.IOException; 
+
+public class KinectTest extends PApplet {
+
+
+
+
+
+
+
 
 final int KINECT_DEPTH_WIDTH = 512;
 final int KINECT_DEPTH_HEIGHT = 424;
@@ -16,11 +38,9 @@ PImage smoothImage;
 
 ArrayList<Blob> blobs = new ArrayList<Blob>();
 
-boolean printDepth = false;
-
-void setup(){
+public void setup(){
   //size(1024, 848);
-  size(512, 424);
+  
   kinect2 = new Kinect2(this);
   if (kinect2.getNumKinects() == 0) {
     exit();
@@ -42,44 +62,23 @@ void setup(){
     background = createImage(KINECT_DEPTH_WIDTH, KINECT_DEPTH_HEIGHT, RGB);
   }
   smoothImage = createImage(KINECT_DEPTH_WIDTH, KINECT_DEPTH_HEIGHT, RGB);
-
-  //writer = createWriter("raw_depth.txt");
 }
 
-void draw() {
-  //image(kinect2.getDepthImage(), 0, 0);
-  //saveRawDepth(kinect2.getRawDepth());
-    int t1 = millis();
-    int[] rawDepth = kinect2.getRawDepth();
-   int[] smoothDepth = filterRawDepthArray(kinect2.getRawDepth());
-   int t2 = millis();
-    smoothImage.loadPixels();
-    for (int x = 0; x < KINECT_DEPTH_WIDTH; x++) {
-      for (int y = 0; y < KINECT_DEPTH_HEIGHT; y++) {
-        int index = x + y * KINECT_DEPTH_WIDTH;
-        int d = rawDepth[index];
-        float rate = 0;
-        if (d != 0) {
-          rate = float(4500 - d) / 4500.0;
-        }
-        smoothImage.pixels[index] = color(255 * rate, 255 * rate, 255 * rate);
-      }
-    }
-    smoothImage.updatePixels();
-   int t3 = millis();
-   detectBlob(smoothImage);
-   int t4 = millis();
-   println("Step 1 time: " + (t2 - t1) + ", step 2 time: " + (t3 - t2));
-    image(smoothImage, 0, 0);
-    if (printDepth) {
-      printArray(rawDepth);
-      exit();
-    }
-   fill(0, 255, 0);
-   ellipse(averageX, averageY, 20, 20);
+public void draw() {
+  image(kinect2.getDepthImage(), 0, 0);
+  int t1 = millis();
+  smoothImage.loadPixels();
+  filterRawDepthArray(kinect2.getRawDepth());
+  smoothImage.updatePixels();
+  int t2 = millis();
+  detectBlob(smoothImage);
+  int t3 = millis();
+  println("Step 1 time: " + (t2 - t1) + ", step 2 time: " + (t3 - t2));
+  fill(0, 255, 0);
+  ellipse(averageX, averageY, 20, 20);
 }
 
-int diffColor(color c1, color c2) {
+public int diffColor(int c1, int c2) {
   int r1 = c1 >> 16 & 0xFF;
   int g1 = c1 >> 8 & 0xFF;
   int b1 = c1 & 0xFF;
@@ -101,14 +100,15 @@ int diffColor(color c1, color c2) {
 *******************************/
 int averageX = 0;
 int averageY = 0;
-void detectBlob(PImage image) {
+public void detectBlob(PImage image) {
   int sumX = 0;
   int sumY = 0;
   int count = 0;
   boolean foundBlob = false;
   for (int x = 0; x < KINECT_DEPTH_WIDTH; x++) {
     for (int y = 0; y < KINECT_DEPTH_HEIGHT; y++) {
-      if (isBlobDiff(background, image, x, y, 3)) {
+      int index = x + y * KINECT_DEPTH_WIDTH;
+      if (isBlobDiff(background, image, x, y, 5)) {
         sumX += x;
         sumY += y;
         count++;
@@ -117,8 +117,8 @@ void detectBlob(PImage image) {
     }
   }
   if (foundBlob) {
-    averageX = int(sumX / count);
-    averageY = int(sumY / count);
+    averageX = PApplet.parseInt(sumX / count);
+    averageY = PApplet.parseInt(sumY / count);
   } else {
     averageX = -20;
     averageY = -20;
@@ -186,7 +186,7 @@ void detectBlob(PImage image) {
 //   }
 // }
 
-boolean isBlobDiff(PImage background, PImage image, int x, int y, int threshold) {
+public boolean isBlobDiff(PImage background, PImage image, int x, int y, int threshold) {
   boolean isDiff = true;
 
   for (int i = -threshold; i <= threshold; i++) {
@@ -196,8 +196,8 @@ boolean isBlobDiff(PImage background, PImage image, int x, int y, int threshold)
       if (nearX >= 0 && nearX < KINECT_DEPTH_WIDTH
         && nearY >= 0 && nearY < KINECT_DEPTH_HEIGHT) {
         int nearIndex = nearX + nearY * KINECT_DEPTH_WIDTH;
-        color bgColor = background.pixels[nearIndex];
-        color currentColor = image.pixels[nearIndex];
+        int bgColor = background.pixels[nearIndex];
+        int currentColor = image.pixels[nearIndex];
         if (diffColor(bgColor, currentColor) < 30 * 30) {
           isDiff = false;
         }
@@ -221,11 +221,11 @@ int innerBandThreshold = 3;
 int outerBandThreshold = 5;
 int avarageThreshold = 30;
 
-int[] filterRawDepthArray(int[] rawDepth) {
-    int[] smoothDepth = new int[rawDepth.length];
+public void filterRawDepthArray(int[] rawDepth) {
+  // int[] smoothDepth = new int[rawDepth.length];
     int widthBound = kinect2.depthWidth - 1;
     int heightBound = kinect2.depthHeight - 1;
-    // int smoothDepth = 0;
+    int smoothDepth = 0;
 
     for (int x = 0; x < kinect2.depthWidth; x++) {
         for (int y = 0; y < kinect2.depthHeight; y++) {
@@ -280,24 +280,23 @@ int[] filterRawDepthArray(int[] rawDepth) {
                             break;
                         }
                     }
-                    smoothDepth[offset] = depth;
+                    smoothDepth = depth;
                 }
                 //println("################ Finish to smooth");
             } else {
-                smoothDepth[offset] = rawDepth[offset];
+                smoothDepth = rawDepth[offset];
             }
 
-            // float rate = 0;
-            // if (smoothDepth != 0) {
-            //   rate = float(4500 - smoothDepth) / 4500.0;
-            // }
-            // smoothImage.pixels[offset] = color(255 * rate, 255 * rate, 255 * rate);
+            float rate = 0;
+            if (smoothDepth != 0) {
+              rate = PApplet.parseFloat(4500 - smoothDepth) / 4500.0f;
+            }
+            smoothImage.pixels[offset] = color(255 * rate, 255 * rate, 255 * rate);
         }
     }
-    return smoothDepth;
 }
 
-int[] zeroDepthFilling(int[] depth, int threshold) {
+public int[] zeroDepthFilling(int[] depth, int threshold) {
   int[] nonZeroDepth = new int[depth.length];
   for (int x = 0; x < kinect2.depthWidth; x++) {
     for (int y = 0; y < kinect2.depthHeight; y++) {
@@ -328,7 +327,7 @@ int[] zeroDepthFilling(int[] depth, int threshold) {
 
 Queue<int[]> averageQueue = new LinkedList<int[]>();
 
-int[] comparePreviousDepth(int[] depthArray) {
+public int[] comparePreviousDepth(int[] depthArray) {
   averageQueue.add(depthArray);
   int[] result = new int[depthArray.length];
   for (int x = 0; x < kinect2.depthWidth; x++) {
@@ -360,7 +359,7 @@ int[] comparePreviousDepth(int[] depthArray) {
   return result;
 }
 
-int[] weightedMovingAverage(int[] depthArray) {
+public int[] weightedMovingAverage(int[] depthArray) {
   averageQueue.add(depthArray);
 
   if (averageQueue.size() > avarageThreshold) {
@@ -394,7 +393,7 @@ int[] weightedMovingAverage(int[] depthArray) {
   return averagedDepthArray;
 }
 
-PImage denosieDepthImage(PImage image, int[] rawDepth, int averageThreshold, int medianThreshold) {
+public PImage denosieDepthImage(PImage image, int[] rawDepth, int averageThreshold, int medianThreshold) {
   int depthWidth = image.width;
   int depthHeight = image.height;
   PImage smoothedImage = image.copy();
@@ -411,7 +410,7 @@ PImage denosieDepthImage(PImage image, int[] rawDepth, int averageThreshold, int
             int searchY = y + j;
             if (searchX >= 0 && searchX <= depthWidth - 1
                && searchY >= 0 && searchY <= depthHeight -1) {
-              color c = smoothedImage.pixels[searchX + searchY * depthWidth];
+              int c = smoothedImage.pixels[searchX + searchY * depthWidth];
               int r = c >> 16 & 0xFF;
               int g = c >> 8 & 0xFF;
               int b = c & 0xFF;
@@ -431,7 +430,7 @@ PImage denosieDepthImage(PImage image, int[] rawDepth, int averageThreshold, int
   return medianFilter(smoothedImage, medianThreshold);
 }
 
-PImage medianFilter(PImage image, int templateSize) {
+public PImage medianFilter(PImage image, int templateSize) {
   if (templateSize % 2 == 0) {
     println("Invalid template size, has to been 3, 5, 7... etc");
     return null;
@@ -452,7 +451,7 @@ PImage medianFilter(PImage image, int templateSize) {
         for (int j = - (templateSize - 1) / 2; j <= (templateSize -1) / 2; j++) {
           int searchX = x + i;
           int searchY = y + j;
-          color c = image.pixels[searchX + searchY * image.width];
+          int c = image.pixels[searchX + searchY * image.width];
           redArray[index] = c>>16 & 0xFF;
           greenArray[index] = c>>8 & 0xFF;
           blueArray[index] = c & 0xFF;
@@ -477,51 +476,38 @@ PImage medianFilter(PImage image, int templateSize) {
 *
 *******************************/
 
-void saveBackgounndImage() {
-  // background = get();
-  // background.save("image/background.jpg");
-  int[] rawDepth = kinect2.getRawDepth();
-  byte[] data = new byte[rawDepth.length * 2];
-  int offset = 0;
-  for (int i = 0; i < rawDepth.length; i++) {
-    data[offset++] = (byte)(rawDepth[i] >> 8 & 0xFF);
-    data[offset++] = (byte)(rawDepth[i] & 0xFF);
-  }
-  saveBytes("data/background.dat",data);
-
+public void saveBackgounndImage() {
+  background = get();
+  background.save("image/background.jpg");
   println("Updated background image successful");
 }
 
 boolean cmdPressed = false;
-void keyPressed() {
+public void keyPressed() {
   if (key == CODED) {
     if (keyCode == 157) cmdPressed = true;
   } else {
     if (cmdPressed && key == 'b') {
       saveBackgounndImage();
-    } else if (cmdPressed && key == 's') {
-      smoothImage.save("image/smooth" + millis() + ".jpg");
+    } else if (cmdPressed && key == 'i') {
+      innerBandThreshold++;
+    } else if (cmdPressed && key =='u') {
+      innerBandThreshold--;
+    } else if (cmdPressed && key == 'o') {
+      outerBandThreshold++;
     } else if (cmdPressed && key == 'p') {
-      //writeToFile();
-    } else if (cmdPressed && key == 'e') {
-      printDepth = true;
+      outerBandThreshold--;
     }
   }
 }
 
-//void writeToFile() {
-//  writer.flush();
-//  writer.close();
-//  exit();
-//}
-
-void keyReleased() {
+public void keyReleased() {
   if (key == CODED) {
     if (keyCode == 157) cmdPressed = false;
   }
 }
 
-void displayThreshold() {
+public void displayThreshold() {
   fill(255, 0, 0);
   text("inner band threshold: " + innerBandThreshold, 20, 20);
   fill(255, 0, 0);
@@ -532,7 +518,7 @@ void displayThreshold() {
   text("avarage queue size: " + averageQueue.size(), 20, 80);
 }
 
-void displayInfo(int rawDepth, int filterDepth) {
+public void displayInfo(int rawDepth, int filterDepth) {
   fill(255, 0, 0);
   text("mouse: " + mouseX + ":" + mouseY, 20, 20);
   fill(255, 0, 0);
@@ -541,19 +527,182 @@ void displayInfo(int rawDepth, int filterDepth) {
   text("filtered depth: " + filterDepth, 20, 60);
 }
 
-void displayColor(color c) {
+public void displayColor(int c) {
   fill(255, 0, 0);
   text("mouse: " + mouseX + ":" + mouseY, 20, 20);
   fill(255, 0, 0);
   text("raw color: " + red(c) + "," + green(c) + "," + blue(c), 20, 40);
 }
-
-void saveRawDepth(int[] rawDepth) {
-  byte[] data = new byte[rawDepth.length * 2];
-  int offset = 0;
-  for (int i = 0; i < rawDepth.length; i++) {
-    data[offset++] = (byte)(rawDepth[i] >> 8 & 0xFF);
-    data[offset++] = (byte)(rawDepth[i] & 0xFF);
+class Blob {
+  float minX;
+  float minY;
+  float maxX;
+  float maxY;
+  
+  ArrayList<PVector> points;
+  
+  public Blob(float x, float y) {
+    minX = x;
+    minY = y;
+    maxX = x;
+    maxY = y;
+    points = new ArrayList<PVector>();
+    points.add(new PVector(x, y));
   }
-  saveBytes("data/raw_depth" + millis() + ".dat",data);
+  
+  public void show() {
+    stroke(0, 255, 0);
+    strokeWeight(2);
+    rectMode(CORNERS);
+    rect(minX, minY, maxX, maxY);
+  }
+  
+  public void add(float x, float y) {
+    points.add(new PVector(x, y));
+    minX = min(minX, x);
+    minY = min(minY, y);
+    maxX = max(maxX, x);
+    maxY = max(maxY, y);
+  }
+  
+  public float size() {
+    return (maxX - minX) * (maxY - minY);
+  }
+  
+  public boolean isNear(float x, float y) {
+    float d = 1000000;
+    for (PVector v : points) {
+      float tempD = distSq(x, y, v.x, v.y);
+      if (tempD < d) {
+        d = tempD;
+      }
+    }
+    
+    if (d < 10 * 10) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
+  private float distSq(float x1, float y1, float x2, float y2) {
+    return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+  }
+}
+class GaussianFilter {
+  
+  private double[] kernel;
+  private int kernelSize;
+  private int width;
+  private int height;
+  
+  public GaussianFilter(float sigma, int kernelSize, int width, int height) {
+    this.kernelSize = kernelSize;
+    this.width = width;
+    this.height = height;
+    
+    kernel = new double[kernelSize * kernelSize];
+    for (int y = 0; y < kernelSize; y++) {
+      double y2c = y - (kernelSize - 1) / 2;
+      for (int x = 0; x < kernelSize; x++) {
+        double x2c = x - (kernelSize - 1) / 2; 
+        kernel[x + y * kernelSize] = 1 / (2 * Math.PI * sigma * sigma) 
+                    * Math.exp(- (x2c * x2c + y2c * y2c) / (2 * sigma * sigma));
+      }
+    }
+    
+  }
+  
+  public int[] filter(int[] input) {
+    int[] result = new int[input.length];
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        int value = 0;
+        int overflow = 0;
+        int kernelHalf = (kernelSize - 1) / 2;
+        for (int j = -kernelHalf; j <= kernelHalf; j++) {
+          for (int i = -kernelHalf; i <= kernelHalf; i++) {
+            int searchX = x + i;
+            int searchY = y + j;
+            int kernelIndex = i + j * kernelSize + ((kernelSize * kernelSize) - 1) / 2;
+            if (searchX < 0 || searchX >= width || searchY < 0 || searchY >= height) {
+              overflow += kernel[kernelIndex];
+              continue;
+            }
+            int v = input[searchX + searchY * width];
+            if (v == 0) {
+              v = 4500;
+            }
+            value += (int)(v * kernel[kernelIndex]);
+          }
+        }
+        
+        if (overflow > 0) {
+          value = 0;
+          for (int j = -kernelHalf; j <= kernelHalf; j++) {
+            for (int i = -kernelHalf; i <= kernelHalf; i++) {
+              int searchX = x + i;
+              int searchY = y + j;
+              int kernelIndex = i + j * kernelSize + ((kernelSize * kernelSize) - 1) / 2;
+              if (searchX < 0 || searchX >= width || searchY < 0 || searchY >= height) {
+                continue;
+              }
+              int v = input[searchX + searchY * width];
+              if (v == 0) {
+                v = 4500;
+              }
+              value += (int)(v * kernel[kernelIndex] * (1 / (1 - overflow)));
+            }
+          }
+        }
+        result[x + y * width] = value;
+      }
+    }
+    //println("Here i am");
+    return result;
+  }
+}
+class LinePatternView {
+  //PImage image;
+  PGraphics image;
+  int lineWidth;
+  
+  float lastX = -1;
+  float lastY = -1;
+  
+  LinePatternView(int width, int height, int lineWidth) {
+    image = createGraphics(width, height);
+    this.lineWidth = lineWidth;
+  }
+  
+  public void update(float x, float y) {
+    if (x == -1 && y == -1) {
+      lastX = x;
+      lastY = y;
+      return;
+    }
+    
+    if (lastX != -1 || lastY != -1) {
+      x = lerp(lastX, x, 0.2f);
+      y = lerp(lastY, y, 0.2f);
+    }
+    image.beginDraw();
+    image.background(0);
+    image.stroke(255);
+    image.rect(x - lineWidth / 2, 0, lineWidth, image.height);
+    image.endDraw();
+    lastX = x;
+    lastY = y;
+  }
+  
+}
+  public void settings() {  size(512, 424); }
+  static public void main(String[] passedArgs) {
+    String[] appletArgs = new String[] { "KinectTest" };
+    if (passedArgs != null) {
+      PApplet.main(concat(appletArgs, passedArgs));
+    } else {
+      PApplet.main(appletArgs);
+    }
+  }
 }
