@@ -8,3 +8,4 @@ application.macosx
 *.dat
 *.jpg
 *.txt
+*build*

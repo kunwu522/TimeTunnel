@@ -7,8 +7,8 @@ byte[] intToByte(int[] ints) {
   byte[] bytes = new byte[ints.length * 2];
   int offset = 0;
   for (int i = 0; i < ints.length; i++) {
-    byte[offset++] = (byte)((ints[i] >> 8) & 0xFF);
-    byte[offset++] = (byte)(ints[i] & 0xFF);
+    bytes[offset++] = (byte)((ints[i] >> 8) & 0xFF);
+    bytes[offset++] = (byte)(ints[i] & 0xFF);
   }
   return bytes;
 }
@@ -19,8 +19,9 @@ int[] byteToInt(byte[] bytes) {
     exit();
   }
   int[] ints = new int[bytes.length / 2];
-  for (int i = 0; i < bytes.length; i+=2) {
-    ints[i] = ((bytes[i] & 0xFF) << 8) | (bytes[i+1] & 0xFF);
+  int offset = 0;
+  for (int i = 0; i < bytes.length - 1; i+=2) {
+    ints[offset++] = ((bytes[i] & 0xFF) << 8) | (bytes[i+1] & 0xFF);
   }
   return ints;
 }

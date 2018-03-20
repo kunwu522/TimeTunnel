@@ -15,6 +15,27 @@ void recordKinect() {
     }
   }
   saveData(rawDepth);
+  image(getDenoisedDepthImage(rawDepth), 0, 0);
+}
+
+int fileOffset = 0;
+void displayDataFiles() {
+  background(0);
+  // println("Start to display...");
+  // for (File file : files) {
+  File file = files[fileOffset++];
+  int[] rawDepth = loadData("data/" + file.getName());
+  println("read file " + file.getName() + ", length: " + rawDepth.length);
+  if (rawDepth == null) {
+    println("Error, can not read data from " + file.getName());
+    exit();
+    return;
+  }
+  PImage smoothImage = getDenoisedDepthImage(rawDepth);
+  image(smoothImage,0,0);
+  if (fileOffset == files.length) {
+    exit();
+  }
 }
 
 void displayKinectSmoothDepth() {
