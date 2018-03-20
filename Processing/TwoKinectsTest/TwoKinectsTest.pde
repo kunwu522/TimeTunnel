@@ -44,8 +44,21 @@ void setup() {
 }
 
 void draw() {
-  image(kinect2a.getDepthImage(), 0, 0);
-  image(kinect2b.getDepthImage(), 512, 0);
+  int[] rawDepth1 = kinect2a.getRawDepth();
+  int[] rawDepth2 = kinect2b.getRawDepth();
+  int[] rawDepth = new int[rawDepth1.length + rawDepth2.length];
+  for (int i = 0; i < rawDepth.length; i++) {
+    int x = i % KINECT_WIDTH;
+    int y = (i - x) / KINECT_WIDTH;
+    if (x < KINECT_WIDTH) {
+      rawDepth[i] = kinect2a.getRawDepth[x + y * KINECT_WIDTH];
+    } else {
+      x = x - KINECT_WIDTH;
+      rawDepth[i] = kinect2b.getRawDepth[x + y * KINECT_WIDTH];
+    }
+  }
+  PImage smoothImage = getDenoisedDepthImage(rawDepth);
+  image(smoothImage,0,0);
 }
 
 boolean checkKinect(Kinect2 kinect2) {
